@@ -5,10 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class TakingMainScene : MonoBehaviour
 {
-    // private SceneManager sceneHome;
-
-  
-
+    //private SceneManager sceneHome;
     public void HomeSceneButton()
     {
         SceneManager.LoadScene("RunnerUpMain");
