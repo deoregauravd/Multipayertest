@@ -8,6 +8,7 @@ public class ObjectPool : MonoBehaviour
     public List<GameObject> pooledObjects;
     public GameObject objectToPool;
     public int amountToPool;
+    
 
     private void Awake()
     {
@@ -17,12 +18,13 @@ public class ObjectPool : MonoBehaviour
     void Start()
     {
         pooledObjects = new List<GameObject>();
-        GameObject tmp;
+        GameObject hurdle;
+
         for ( int i = 0; i< amountToPool; i++)
         {
-            tmp = Instantiate(objectToPool);
-            tmp.SetActive(false);
-            pooledObjects.Add(tmp);
+            hurdle = Instantiate(objectToPool);
+            hurdle.SetActive(false);
+            pooledObjects.Add(hurdle);
         }
     }
 
@@ -32,11 +34,15 @@ public class ObjectPool : MonoBehaviour
         {
             if (!pooledObjects[i].activeInHierarchy)
             {
+
                 return pooledObjects[i];
+
             }
         }
         return null;
     }
+
+  
 
 
 

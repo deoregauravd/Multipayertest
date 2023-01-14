@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject sceneOne;
     public GameObject sceneTwo;
     public GameObject sceneThree;
+   // public static GameObject hurdle;
     private enum MovementState { jump , right, left, slide, run };
 
     public static PlayerMovement instance;
@@ -90,7 +91,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-       
+      
 
     }
 
@@ -101,12 +102,14 @@ public class PlayerMovement : MonoBehaviour
 
     public void UpdateRoad()
     {
-        if (playerMovement.position.z > 15 && playerMovement.position.z < 55)
+        if (playerMovement.position.z > 15 && playerMovement.position.z < 55 )
         {
             //GameObject scenetwo  = GameObject.FindGameObjectWithTag("sceneTwo");
             sceneTwo.transform.position = new Vector3(0, 0, 55);
             sceneTwo.SetActive(true);
             Debug.Log("scene TwoActivation");
+            HurdleGenration();
+
         }
         else if (sceneTwo.activeInHierarchy && playerMovement.position.z > 65)
         {
@@ -123,6 +126,17 @@ public class PlayerMovement : MonoBehaviour
             sceneTwo.SetActive(false);
             Debug.Log("scene one Reactivation");
 
+        }
+
+        void HurdleGenration()
+        {
+            GameObject hurdle = ObjectPool.SharedInstance.GetPooledObject();
+            if (hurdle != null)
+            {
+                hurdle.transform.position = new Vector3(0, 0, 55);
+                hurdle.transform.position = new Vector3(0, 0, 110);
+                hurdle.gameObject.SetActive(true);
+            }
         }
 
 
