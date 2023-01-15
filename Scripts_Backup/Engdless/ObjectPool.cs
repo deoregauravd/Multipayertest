@@ -5,10 +5,14 @@ using UnityEngine;
 public class ObjectPool : MonoBehaviour
 {
     public static ObjectPool SharedInstance;
-    public List<GameObject> pooledObjects;
-    public GameObject objectToPool;
+    public Queue<GameObject> hurdlePool;
+    public Queue<GameObject> coinPool;
+    public GameObject hurdlePrefab;
+    public GameObject coinPrefab;
     public int amountToPool;
-    
+    public Transform[] hurdlePositions;
+    public Transform[] coinPositions;
+
 
     private void Awake()
     {
@@ -17,34 +21,88 @@ public class ObjectPool : MonoBehaviour
 
     void Start()
     {
-        pooledObjects = new List<GameObject>();
-        GameObject hurdle;
-
-        for ( int i = 0; i< amountToPool; i++)
-        {
-            hurdle = Instantiate(objectToPool);
-            hurdle.SetActive(false);
-            pooledObjects.Add(hurdle);
-        }
-    }
-
-    public GameObject GetPooledObject()
-    {
-        for (int i = 0; i<amountToPool; i++)
-        {
-            if (!pooledObjects[i].activeInHierarchy)
+        { 
+            coinPool = new Queue<GameObject>();
+            hurdlePool = new Queue<GameObject>();
+            for (int i = 0; i < amountToPool; i++)
             {
-                return pooledObjects[i];
+                GameObject coin = Instantiate(coinPrefab);
+                GameObject hurdle = Instantiate(hurdlePrefab);
+
+                coin.SetActive(false);
+                hurdle.SetActive(false);
+                coinPool.Enqueue(coin);
+                hurdlePool.Enqueue(hurdle);
             }
-           
         }
-        
-        return null;
+
+   
     }
 
+    private void Update()
+    {
+    
+    }
 
-  
+    public GameObject GetHurdlePooledObject()
+    {
+        if (hurdlePool.Count ==0)
+        {
+            GameObject hurdle = Instantiate(hurdlePrefab);
+            return hurdle;
+        }
+        else
+        {
+            GameObject hurdle = hurdlePool.Dequeue();
+            hurdle.SetActive(true);
+            return hurdle;
+        }
+    }
 
+    public GameObject GetCoinsPooledObject()
+    {
+        if (coinPool.Count == 0)
+        {
+            GameObject coin = Instantiate(coinPrefab);
+            return coin;
+        }
+        else
+        {
+            GameObject coin = coinPool.Dequeue();
+            coin.SetActive(true);
+            return coin;
+        }
+    }
 
+    public void CoinGeneration()
+    {
+        GameObject coin = ObjectPool.SharedInstance.GetCoinsPooledObject();
+        for (int i = 0; i < ObjectPool.SharedInstance.coinPool.Count; i++)
+        {
+            if (coin != null) // if you dont use this codition its going to return null value from object pooling and it will cause null reference
+            {
+                Vector3 position = coinPositions[i].position;
+                coin.transform.position = position; //new Vector3(0, 5, (i * 30));
+                coin.gameObject.SetActive(true);
+            }
 
+        }
+    }
+
+    public void HurdleGenration()
+    {
+
+        GameObject hurdle = ObjectPool.SharedInstance.GetHurdlePooledObject();
+        for (int i = 0; i <10; i++)
+        {
+            if (hurdle != null) // if you dont use this codition its going to return null value from object pooling and it will cause null reference
+            {
+                Vector3 positionHurdle = hurdlePositions[i].position;
+                hurdle.transform.position = positionHurdle; //new Vector3(0, 5, (i * 30));
+                hurdle.gameObject.SetActive(true);
+            }
+
+        }
+
+    }
 }

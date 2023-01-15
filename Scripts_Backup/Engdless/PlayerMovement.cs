@@ -9,29 +9,27 @@ public class PlayerMovement : MonoBehaviour
     public CharacterController player;
     public float speed = 1f;
     public float moveSpeed;
+    public float jumpspeed = 1f;
     public  Vector3 movement;
-   
 
     // Player GUI
-    public static int health;
-    public int startHealth = 3;
+    public float health;
+    public static float startHealth = 3;
     public float distanceCover;
-   
-
+    public float score;
 
     // Player Animation
     private Animator anim;
-    public  float jumpspeed = 1f;
-    public Transform scenetwoPos;
+    //public Transform scenetwoPos;
+    private enum MovementState { jump, right, left, slide, run };
 
     // Scenes in Game
     public GameObject sceneOne;
     public GameObject sceneTwo;
     public GameObject sceneThree;
-    public Transform[] hurdlePos;
-   // public static GameObject hurdle;
-    private enum MovementState { jump , right, left, slide, run };
-
+ 
+ 
+    // Singletone
     public static PlayerMovement instance;
 
     private void Awake()
@@ -49,14 +47,12 @@ public class PlayerMovement : MonoBehaviour
     {
         player = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
-
-        health = startHealth;
+        health = startHealth; // on start it will reset its health; 
     }
 
     private void Update()
     {
         UpdateAnimatorAnimation();
-        DistanceCovered();
     }
 
     private void UpdateAnimatorAnimation()
@@ -114,7 +110,8 @@ public class PlayerMovement : MonoBehaviour
             sceneTwo.transform.position = new Vector3(0, 0, 55);
             sceneTwo.SetActive(true);
             Debug.Log("scene TwoActivation");
-            HurdleGenration();
+            ObjectPool.SharedInstance.CoinGeneration();
+            ObjectPool.SharedInstance.HurdleGenration();
 
         }
         else if (sceneTwo.activeInHierarchy && playerMovement.position.z > 65)
@@ -132,30 +129,29 @@ public class PlayerMovement : MonoBehaviour
             sceneTwo.SetActive(false);
             Debug.Log("scene one Reactivation");
         }
-
-        void HurdleGenration()
-        {
-
-            GameObject hurdle = ObjectPool.SharedInstance.GetPooledObject();
-            for (int i = 0; i < ObjectPool.SharedInstance.pooledObjects.Count; i++)
-            {
-                if (hurdle != null) // if you dont use this codition its going to return null value from object pooling and it will cause null reference
-                {
-                    Vector3 position = hurdlePos[i].position;
-                    ObjectPool.SharedInstance.pooledObjects[i].transform.position = position; //new Vector3(0, 5, (i * 30));
-                    hurdle.gameObject.SetActive(true);
-                }
-                
-            }
-          
-        }
-       
+    
     }
-    public void DistanceCovered()
-    {
-        distanceCover = playerMovement.position.z;
 
-      //  Debug.Log(distanceCover + "distacecover");
+    // Collison Detection for coins and hurdle
+  
+
+    public void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        GameObject hurdle = ObjectPool.SharedInstance.GetHurdlePooledObject();
+        GameObject coin = ObjectPool.SharedInstance.GetCoinsPooledObject();
+        if (hit.gameObject.CompareTag("coin") && coin != null)
+        {
+            score++;
+            coin.SetActive(false);
+            Debug.Log("hitwithCoindeteced");
+        }
+
+        if (hit.gameObject.CompareTag("hurdle"))
+        {
+            health--;
+            hurdle.gameObject.SetActive(false);
+   
+        }
     }
 }
 
@@ -218,4 +214,24 @@ public class PlayerMovement : MonoBehaviour
      hurdle.gameObject.SetActive(true);
  }
 
-*/
+
+/*    public void DistanceCovered()
+    {
+        distanceCover = playerMovement.position.z;
+
+      //Debug.Log(distanceCover + "distacecover");
+    }*/
+/*
+private void OnTriggerEnter(Collider other)
+{
+    if (other.CompareTag("coin"))
+    {
+        score++;
+    }
+
+    if (other.CompareTag("hurdle"))
+    {
+        health--;
+    }
+
+}*/
