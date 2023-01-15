@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     public GameObject sceneOne;
     public GameObject sceneTwo;
     public GameObject sceneThree;
+    public Transform[] hurdlePos;
    // public static GameObject hurdle;
     private enum MovementState { jump , right, left, slide, run };
 
@@ -62,7 +63,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            movement.y -= 9 * Time.deltaTime;
+            movement.y -= 7 * Time.deltaTime;  //Adding Gravity to scene.
             state = MovementState.run;
         }
         if (player.velocity.x > 0.1f)
@@ -84,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
 
         player.Move(movement);
 
-        // player.center = new Vector3(player.center.x, 8f, player.center.z);
+        player.center = new Vector3(player.center.x, 8f, player.center.z);
        UpdateRoad();
 
     }
@@ -130,14 +131,36 @@ public class PlayerMovement : MonoBehaviour
 
         void HurdleGenration()
         {
+
+
+            /* foreach (GameObject hurdle in  ObjectPool.SharedInstance.pooledObjects)
+             {
+                // hurdle.transform.position = new Vector3(0, 0, 55);
+                 //hurdle.transform.position = new Vector3(0, 0, 110);
+                 hurdle.gameObject.SetActive(true);
+             }
+
+ */
             GameObject hurdle = ObjectPool.SharedInstance.GetPooledObject();
-            if (hurdle != null)
+            for (int i = 0; i < ObjectPool.SharedInstance.pooledObjects.Count; i++)
             {
-                hurdle.transform.position = new Vector3(0, 0, 55);
-                hurdle.transform.position = new Vector3(0, 0, 110);
-                hurdle.gameObject.SetActive(true);
+                if (hurdle != null) // if you dont use this codition its going to return null value from object pooling and it will cause null reference
+                {
+                    Vector3 position = hurdlePos[i].position;
+                    ObjectPool.SharedInstance.pooledObjects[i].transform.position = position;//new Vector3(0, 5, (i * 30));
+                    hurdle.gameObject.SetActive(true);
+                }
+                
             }
+            /*  if (hurdle != null)
+              {
+                  hurdle.transform.position = new Vector3(0, 0, 55);
+                  hurdle.transform.position = new Vector3(0, 0, 110);
+                  hurdle.gameObject.SetActive(true);
+              }*/
         }
+
+
 
 
 
