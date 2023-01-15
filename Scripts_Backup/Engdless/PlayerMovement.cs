@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {  
@@ -13,8 +14,8 @@ public class PlayerMovement : MonoBehaviour
     public  Vector3 movement;
 
     // Player GUI
-    public float health;
-    public static float startHealth = 3;
+    public int health;
+    public static int startHealth = 3;
     public float distanceCover;
     public float score;
 
@@ -42,12 +43,15 @@ public class PlayerMovement : MonoBehaviour
         {
             instance = this;
         }
+
+        
     }
     private void Start()
     {
         player = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
         health = startHealth; // on start it will reset its health; 
+        
     }
 
     private void Update()
@@ -80,7 +84,9 @@ public class PlayerMovement : MonoBehaviour
         if (player.velocity.x > 0.1f)
         {
             state = MovementState.right;
-           // Debug.Log("Right");
+            // Debug.Log("Right");
+            /*ObjectPool.SharedInstance.CoinGeneration();
+            ObjectPool.SharedInstance.HurdleGenration();*/
         }
         else if (player.velocity.x < 0) //(-0.1f))
         {
@@ -109,9 +115,9 @@ public class PlayerMovement : MonoBehaviour
             //GameObject scenetwo = GameObject.FindGameObjectWithTag("sceneTwo");
             sceneTwo.transform.position = new Vector3(0, 0, 55);
             sceneTwo.SetActive(true);
+          //  ObjectPool.SharedInstance.GetCoinsPooledObject;
             Debug.Log("scene TwoActivation");
-            ObjectPool.SharedInstance.CoinGeneration();
-            ObjectPool.SharedInstance.HurdleGenration();
+           
 
         }
         else if (sceneTwo.activeInHierarchy && playerMovement.position.z > 65)
@@ -137,21 +143,34 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        GameObject hurdle = ObjectPool.SharedInstance.GetHurdlePooledObject();
-        GameObject coin = ObjectPool.SharedInstance.GetCoinsPooledObject();
-        if (hit.gameObject.CompareTag("coin") && coin != null)
+       // GameObject hurdle = ObjectPool.SharedInstance.GetHurdlePooledObject();
+        //GameObject coin = ObjectPool.SharedInstance.GetCoinsPooledObject();
+        if (hit.gameObject.CompareTag("coin") )
         {
             score++;
-            coin.SetActive(false);
+            //  coin.SetActive(false);
+           // CoinPool.CoinPoolInstance.ReturnCoin(hit.gameObject);
+            hit.gameObject.transform.position = new Vector3(0, 0, playerMovement.position.z + 22);
             Debug.Log("hitwithCoindeteced");
         }
 
         if (hit.gameObject.CompareTag("hurdle"))
         {
             health--;
-            hurdle.gameObject.SetActive(false);
-   
+           // Destroy(hurdle);
+            hit.gameObject.SetActive(false);
+            Debug.Log("hitwithHurdledeteced");
         }
+
+        if (health == 0)
+        {
+            SceneManager.LoadScene("Home");
+        }
+    }
+
+    public void CoinGenration()
+    {
+        
     }
 }
 
